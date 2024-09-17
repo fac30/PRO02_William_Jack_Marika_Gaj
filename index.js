@@ -139,6 +139,20 @@ client.on(Events.InteractionCreate, async (interaction) => {
   }
 });
 
+// Handle messageCreate directly in index.js
+client.on(Events.MessageCreate, (message) => {
+  // Ignore messages from bots to avoid an infinite loop
+  if (message.author.bot) return;
+
+  // Log received messages to the console
+  console.log(`Received message: ${message.content}`);
+
+  // Example: Respond to a specific message
+  if (message.content === "!ping") {
+    message.channel.send("Pong!"); // Reply with 'Pong!'
+  }
+});
+
 // This line must be at the very end
 // Signs the bot in with token
 client.login(discordToken);
