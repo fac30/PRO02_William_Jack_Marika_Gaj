@@ -30,76 +30,109 @@ const discordToken = process.env.DISCORD_TOKEN;
 client.commands = new Collection();
 
 async function loadCommands() {
+  // Define the path to the 'commands' directory using path.join to handle cross-platform path issues.
   const foldersPath = path.join(__dirname, "commands");
+
+  // Log the path to ensure it's correct and the directory exists.
   console.log("Folders Path:", foldersPath); // Ensure this path is correct
 
   try {
-    // Read all files directly in the commands directory
+    // Read all files in the 'commands' directory asynchronously using readdir.
+    // readdir returns an array of file names in the directory.
     const commandFiles = await readdir(foldersPath);
 
+    // Log the names of all command files found in the directory.
     console.log("Command Files:", commandFiles); // Log the files found
 
+    // Iterate over each file name in the 'commandFiles' array.
     for (const file of commandFiles) {
+      // Check if the file has a .js extension to ensure it's a JavaScript file.
       if (file.endsWith(".js")) {
+        // Construct the full path to the command file.
         const filePath = path.join(foldersPath, file);
-        console.log("Command file path:", filePath);
 
         try {
+          // Dynamically import the command module from the file path.
+          // `import(filePath)` is used to import ES modules dynamically.
+          // Access the default export of the module using `.default`.
           const command = (await import(filePath)).default;
 
+          // Check if the imported command has the required properties: 'data' and 'execute'.
           if ("data" in command && "execute" in command) {
+            // Add the command to the `client.commands` collection using the command's name as the key.
             client.commands.set(command.data.name, command);
           } else {
+            // Log a warning if the command is missing the required properties.
             console.warn(
               `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
             );
           }
         } catch (importError) {
+          // Log an error if there is an issue importing the command file.
           console.error(`Error importing command at ${filePath}:`, importError);
         }
       }
     }
   } catch (error) {
+    // Log an error if there is an issue reading the command files from the directory.
     console.error("Error reading command files:", error);
   }
 }
 
+// Call the loadCommands function to load all commands into the client.
+
 loadCommands();
 
-// Initialize a collection for commands
-client.commands = new Collection();
-
-// Function to load events dynamically
+/**
+ * Asynchronously loads all event files from the 'events' directory.
+ * Reads the files, dynamically imports them, and registers them with the client.
+ */
 async function loadEvents() {
+  // Define the path to the 'events' directory using path.join to handle cross-platform path issues.
   const eventsPath = path.join(__dirname, "events");
+  // Log the path to ensure it's correct and the directory exists.
   console.log("Events Path:", eventsPath); // Log the path to the events folder
 
   try {
-    // Read all the files in the 'events' folder
+    // Read all files in the 'events' directory asynchronously using readdir.
+    // readdir returns an array of file names in the directory.
     const eventFiles = await readdir(eventsPath);
-    console.log("Event Files:", eventFiles); // Log the event files found
 
+    // Log the names of all event files found in the directory.
+    console.log("Event Files:", eventFiles);
+
+    // Iterate over each file name in the 'eventFiles' array.
     for (const file of eventFiles) {
+      // Check if the file has a .js extension to ensure it's a JavaScript file.
       if (file.endsWith(".js")) {
+        // Construct the full path to the event file.
         const filePath = path.join(eventsPath, file);
+        // Log the full path of the event file being processed.
         console.log("Event file path:", filePath); // Log the path to the event file
 
         try {
-          // Dynamically import each event file
+          // Dynamically import the event module from the file path.
+          // `import(filePath)` is used to import ES modules dynamically.
+          // Access the default export of the module using `.default`.
           const event = (await import(filePath)).default;
 
-          // Register the event with the client
+          // Register the event with the client.
+          // Check if the event should be handled once (single occurrence) or multiple times.
           if (event.once) {
+            // Register an event listener that only triggers once using `client.once`.
             client.once(event.name, (...args) => event.execute(...args));
+            // Register an event listener that can trigger multiple times using `client.on`.
           } else {
             client.on(event.name, (...args) => event.execute(...args));
           }
+          // Log an error if there is an issue importing the event file.
         } catch (importError) {
           console.error(`Error importing event at ${filePath}:`, importError);
         }
       }
     }
   } catch (error) {
+    // Log an error if there is an issue reading the event files from the directory.
     console.error("Error reading event files:", error); // Handle any errors in reading event files
   }
 }
