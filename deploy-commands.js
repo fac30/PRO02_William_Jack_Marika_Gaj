@@ -18,7 +18,7 @@ dotenv.config();
 // Resolve __dirname for ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
+    
 // Initialize the REST client
 const rest = new REST().setToken(process.env.DISCORD_TOKEN);
 
