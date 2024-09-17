@@ -1,30 +1,45 @@
-require("dotenv").config();
-const apiKey = process.env.API_KEY;
-const apiSecret = process.env.API_SECRET;
-console.log("API Key:", apiKey);
-console.log("API Secret:", apiSecret);
+import dotenv from "dotenv"; // Import dotenv using ES6 syntax
+dotenv.config(); // Configure dotenv to load .env file
+import commands from "./commands/commands.js";
+import events from "./events/events.js";
+import testing from "./testing/tests.js";
+import express from "express"; // Import express
 
+import * as Discord from "discord.js"; // Imports discord.js
 
-// Loading command files
-// const fs = require('node:fs');
-// const path = require('node:path');
-// const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
-// const { token } = require('./config.json');
+const client = new Discord.Client({
+  intents: [
+    Discord.GatewayIntentBits.Guilds,
+    Discord.GatewayIntentBits.GuildMessages,
+  ],
+}); //creates new client
 
-// const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const discordToken = process.env.DISCORD_TOKEN;
 
-// client.commands = new Collection();
+const app = express(); // Initialize express
 
+client.on("ready", () => {
+  console.log(`Logged in as ${client.user.tag}!`);
+});
 
-// command handler
-// client.commands = new Collection();
+//this line must be at the very end
+client.login(discordToken); //signs the bot in with token
 
-// const commandFiles = fs
-//   .readdirSync("./commands")
-//   .filter((file) => file.endsWith(".js"));
+// Define a simple get route to display 'Hello World' on the route of the server.
+// app.get("/", (req, res) => {
+//     res.send("Hello, World!");
 
-// for (const file of commandFiles) {
-//   const command = require(`./commands/${file}`);
-//   client.commands.set(command.data.name, command);
-//   commands.push(command.data.toJSON());
-// }
+// });
+
+// app.push("/", (req, res) => {
+//   res.send("hello World");
+// });
+
+// app.delete("/");
+
+// This is listening to port 3000 and showing in the node terminal.
+
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`Listening on http://localhost:${PORT}`);
+});
