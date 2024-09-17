@@ -4,31 +4,30 @@ import commands from "./commands/commands.js";
 import events from "./events/events.js";
 import testing from "./testing/tests.js";
 import express from "express"; // Import express
-
 import * as Discord from "discord.js"; // Imports discord.js
 
+// Creates new client
 const client = new Discord.Client({
   intents: [
     Discord.GatewayIntentBits.Guilds,
     Discord.GatewayIntentBits.GuildMessages,
   ],
-}); //creates new client
+});
 
 const discordToken = process.env.DISCORD_TOKEN;
-
-const app = express(); // Initialize express
 
 client.on("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
 
-//this line must be at the very end
-client.login(discordToken); //signs the bot in with token
+// This line must be at the very end
+// Signs the bot in with token
+client.login(discordToken);
 
+// const app = express(); // Initialize express
 // Define a simple get route to display 'Hello World' on the route of the server.
 // app.get("/", (req, res) => {
 //     res.send("Hello, World!");
-
 // });
 
 // app.push("/", (req, res) => {
@@ -39,7 +38,7 @@ client.login(discordToken); //signs the bot in with token
 
 // This is listening to port 3000 and showing in the node terminal.
 
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`Listening on http://localhost:${PORT}`);
-});
+// const PORT = 3000;
+// app.listen(PORT, () => {
+//   console.log(`Listening on http://localhost:${PORT}`);
+// });
