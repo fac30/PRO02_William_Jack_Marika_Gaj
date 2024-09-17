@@ -4,8 +4,12 @@ import commands from "./commands/commands.js";
 import events from "./events/events.js";
 import testing from "./testing/tests.js";
 import express from "express"; // Import express
+import fs from 'node:fs';
+import path from 'node:path';
+import { Client, Collection, GatewayIntentBits } from 'discord.js';
 
 import * as Discord from "discord.js"; // Imports discord.js
+
 
 const client = new Discord.Client({
   intents: [
@@ -43,3 +47,17 @@ const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Listening on http://localhost:${PORT}`);
 });
+
+
+// Initialise commands collection
+client.commands = new Collection();
+
+// Command handler
+// const commandFiles = fs
+//   .readdirSync("./commands")
+//   .filter((file) => file.endsWith(".js"));
+
+// for (const file of commandFiles) {
+//   const { command } = await import(`./commands/${file}`);
+//   client.commands.set(command.data.name, command);
+// }
