@@ -18,8 +18,6 @@ const openai = new OpenAI({
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-import getMeme from "./commands/meme.js";
-
 // Creates new client
 const client = new Discord.Client({
   intents: [
@@ -194,10 +192,6 @@ client.on(Events.MessageCreate, (message) => {
   }
 });
 
-// This line must be at the very end
-// Signs the bot in with token
-client.login(discordToken);
-
 async function getOpenAIResponse(conversation) {
   try {
     const completion = await openai.chat.completions.create({
@@ -252,3 +246,7 @@ client.on("messageCreate", async (message) => {
     }
   }
 });
+
+//**********************************************  This line must be at the very end ****************************************
+// Signs the bot in with token
+client.login(discordToken);
