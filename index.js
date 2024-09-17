@@ -1,10 +1,9 @@
 import dotenv from "dotenv"; // Import dotenv using ES6 syntax
 dotenv.config(); // Configure dotenv to load .env file
-import Events from "./events/events.js";
 import testing from "./testing/tests.js";
 import express from "express"; // Import express
 import * as Discord from "discord.js"; // Imports discord.js
-import { Collection } from "discord.js";
+import { Collection, Events } from "discord.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import { readdir } from "fs/promises";
