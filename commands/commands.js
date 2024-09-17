@@ -1,5 +1,10 @@
-const commandFunc = () => {
-  return "commands";
-};
+import { SlashCommandBuilder } from "discord.js";
 
-export default commandFunc;
+export default {
+  data: new SlashCommandBuilder()
+    .setName("piiing3")
+    .setDescription("Replies with Pooong!"),
+  async execute(interaction) {
+    await interaction.reply("Pooong!");
+  },
+};

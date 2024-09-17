@@ -1,6 +1,10 @@
-async function getMeme() {
-  const res = await fetch("https://memeapi.pythonanywhere.com/");
-  return res.data.memes[0].url;
-}
+import { SlashCommandBuilder } from "discord.js";
 
-export default getMeme;
+export default {
+  data: new SlashCommandBuilder()
+    .setName("piiing2")
+    .setDescription("Replies with Pooong!"),
+  async execute(interaction) {
+    await interaction.reply("Pooong!");
+  },
+};

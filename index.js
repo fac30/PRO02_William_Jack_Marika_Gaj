@@ -29,39 +29,38 @@ const discordToken = process.env.DISCORD_TOKEN;
 // Initialize a new Collection for storing commands
 client.commands = new Collection();
 
-// Function to load commands
 async function loadCommands() {
   const foldersPath = path.join(__dirname, "commands");
-  console.log(foldersPath);
+  console.log("Folders Path:", foldersPath); // Ensure this path is correct
+
   try {
-    const commandFolders = await readdir(foldersPath, { withFileTypes: true });
-    // console.log(commandFolders);
+    // Read all files directly in the commands directory
+    const commandFiles = await readdir(foldersPath);
 
-    for (const folder of commandFolders) {
-      if (folder.isDirectory()) {
-        const commandsPath = path.join(foldersPath, folder.name);
-        const commandFiles = await readdir(commandsPath);
+    console.log("Command Files:", commandFiles); // Log the files found
 
-        for (const file of commandFiles) {
-          if (file.endsWith(".js")) {
-            const filePath = path.join(commandsPath, file);
-            console.log(filePath);
-            const command = (await import(filePath)).default;
-            console.log(command);
+    for (const file of commandFiles) {
+      if (file.endsWith(".js")) {
+        const filePath = path.join(foldersPath, file);
+        console.log("Command file path:", filePath);
 
-            if ("data" in command && "execute" in command) {
-              client.commands.set(command.data.name, command);
-            } else {
-              console.warn(
-                `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
-              );
-            }
+        try {
+          const command = (await import(filePath)).default;
+
+          if ("data" in command && "execute" in command) {
+            client.commands.set(command.data.name, command);
+          } else {
+            console.warn(
+              `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
+            );
           }
+        } catch (importError) {
+          console.error(`Error importing command at ${filePath}:`, importError);
         }
       }
     }
   } catch (error) {
-    console.error("Error loading commands:", error);
+    console.error("Error reading command files:", error);
   }
 }
 
@@ -75,6 +74,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
 
   const command = interaction.client.commands.get(interaction.commandName);
+  console.log(command);
 
   if (!command) {
     console.error(`No command matching ${interaction.commandName} was found.`);
@@ -102,22 +102,3 @@ client.on(Events.InteractionCreate, async (interaction) => {
 // This line must be at the very end
 // Signs the bot in with token
 client.login(discordToken);
-
-// const app = express(); // Initialize express
-// Define a simple get route to display 'Hello World' on the route of the server.
-// app.get("/", (req, res) => {
-//     res.send("Hello, World!");
-// });
-
-// app.push("/", (req, res) => {
-//   res.send("hello World");
-// });
-
-// app.delete("/");
-
-// This is listening to port 3000 and showing in the node terminal.
-
-// const PORT = 3000;
-// app.listen(PORT, () => {
-//   console.log(`Listening on http://localhost:${PORT}`);
-// });
