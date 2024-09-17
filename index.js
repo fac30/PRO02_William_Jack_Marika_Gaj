@@ -65,6 +65,47 @@ async function loadCommands() {
 
 loadCommands();
 
+// Initialize a collection for commands
+client.commands = new Collection();
+
+// Function to load events dynamically
+async function loadEvents() {
+  const eventsPath = path.join(__dirname, "events");
+  console.log("Events Path:", eventsPath); // Log the path to the events folder
+
+  try {
+    // Read all the files in the 'events' folder
+    const eventFiles = await readdir(eventsPath);
+    console.log("Event Files:", eventFiles); // Log the event files found
+
+    for (const file of eventFiles) {
+      if (file.endsWith(".js")) {
+        const filePath = path.join(eventsPath, file);
+        console.log("Event file path:", filePath); // Log the path to the event file
+
+        try {
+          // Dynamically import each event file
+          const event = (await import(filePath)).default;
+
+          // Register the event with the client
+          if (event.once) {
+            client.once(event.name, (...args) => event.execute(...args));
+          } else {
+            client.on(event.name, (...args) => event.execute(...args));
+          }
+        } catch (importError) {
+          console.error(`Error importing event at ${filePath}:`, importError);
+        }
+      }
+    }
+  } catch (error) {
+    console.error("Error reading event files:", error); // Handle any errors in reading event files
+  }
+}
+
+// Call the loadEvents function to load all event files
+loadEvents();
+
 client.on("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
