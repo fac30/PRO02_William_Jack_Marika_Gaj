@@ -2,9 +2,18 @@ import { SlashCommandBuilder } from "discord.js";
 
 export default {
   data: new SlashCommandBuilder()
-    .setName("piiing2")
-    .setDescription("Replies with Pooong!"),
-  async execute(interaction) {
-    await interaction.reply("Pooong!");
-  },
+  //need to create a slack command that would generate a meme.
+  
+  //import slackcommand.
+  
+  // create an async way to import an image meme
+  
+  //load that image meme.
+  
+  // send that meme to the discord channel.
+  
+  // return a success message.
+    
+  
 };
+
