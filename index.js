@@ -220,14 +220,14 @@ async function replyDiscord(contentToSend, originalMessage) {
 }
 
 // Function to get OpenAI response
-async function getOpenAIResponse(conversation) {
+async function getOpenAIResponse(messageToAI) {
   try {
     console.log("Getting AI response:");
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: [
         { role: "system", content: "You are a helpful assistant." },
-        { role: "user", content: conversation },
+        { role: "user", content: messageToAI },
       ],
       max_tokens: 150,
     });
