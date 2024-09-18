@@ -1,4 +1,5 @@
 import cleanMessage from "../openai/clean-message.js";
+import { handlePersonalityChange } from "../openai/personalities.js";
 
 // Function to handle messages
 async function handleMessage(message) {
@@ -10,6 +11,8 @@ async function handleMessage(message) {
 
   if (message.content.startsWith(prefix)) {
     await cleanMessage(message);
+  } else if (message.content.startsWith("-")) {
+    handlePersonalityChange(message.content);
   }
 }
 
