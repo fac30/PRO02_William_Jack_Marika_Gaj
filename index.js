@@ -7,16 +7,19 @@ import { Collection, Events } from "discord.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import { readdir } from "fs/promises";
-import { SlashCommandBuilder, PermissionFlagsBits, ChannelType } from "discord.js";
+import {
+  SlashCommandBuilder,
+  PermissionFlagsBits,
+  ChannelType,
+} from "discord.js";
 
 // OpenAI Configuration
 import OpenAI from "openai";
 
 // Initialize OpenAI
 const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY, 
-  });
-
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 // Get the current module directory
 const __filename = fileURLToPath(import.meta.url);
@@ -192,34 +195,9 @@ async function handleMessage(message) {
   const prefix = "!";
   const content = message.content.trim();
   console.log(`Received message: ${content}`);
-  
+
   if (message.content.startsWith(prefix)) {
     await handleOpenAIResponse(message);
-  }
-}
-
-// Function to determine if a message should be processed
-function shouldProcessMessage(message) {
-  console.log("checking message processing")
-  return message.channel.type === ChannelType.DM || message.mentions.has(client.user.id);
-}
-
-// Function to handle OpenAI response
-async function handleOpenAIResponse(message) {
-  let cleanContent = message.content;
-
-  console.log("I am calloing handleopenairesponse")
-
-  if (message.channel.type !== ChannelType.DM) {
-    cleanContent = cleanContent.replace(new RegExp(`<@!?${client.user.id}>`, "g"), "").trim();
-  }
-
-  try {
-    console.log("Sending to OpenAI:", cleanContent);
-    const reply = await getOpenAIResponse(cleanContent);
-    await message.channel.send(reply);
-  } catch (error) {
-    console.error("Error processing OpenAI response:", error);
   }
 }
 
@@ -241,10 +219,39 @@ async function getOpenAIResponse(conversation) {
     return completion.choices[0].message.content;
     // throw new Error('throwing error');
   } catch (error) {
-    console.error("Error with OpenAI API:", error.response ? error.response.data : error.message || error);
+    console.error(
+      "Error with OpenAI API:",
+      error.response ? error.response.data : error.message || error
+    );
     // "I encountered an error processing your request.";
   }
 }
+
+// Function to handle OpenAI response
+// takes the user message and clean it using regular expression and trim
+
+async function handleOpenAIResponse(message) {
+  let cleanContent = message.content;
+  console.log(`The cleaned content is ${cleanContent}`);
+
+  if (message.channel.type !== ChannelType.DM) {
+    cleanContent = cleanContent
+      .replace(new RegExp(`<@!?${client.user.id}>`, "g"), "")
+      .trim();
+  }
+  
+  try {
+    console.log("Sending to OpenAI:", cleanContent);
+    // then call getOpenAi response with the cleancontent variable
+    const reply = await getOpenAIResponse(cleanContent);
+    // send reply back to discord channel
+    await message.channel.send(reply);
+  } catch (error) {
+    console.error("Error processing OpenAI response:", error);
+  }
+}
+
+
 
 // This line must be at the very end
 // Signs the bot in with token
