@@ -45,16 +45,10 @@ async function loadCommands() {
   // Define the path to the 'commands' directory using path.join to handle cross-platform path issues.
   const foldersPath = path.join(__dirname, "commands");
 
-  // Log the path to ensure it's correct and the directory exists.
-  console.log("Folders Path:", foldersPath); // Ensure this path is correct
-
   try {
     // Read all files in the 'commands' directory asynchronously using readdir.
     // readdir returns an array of file names in the directory.
     const commandFiles = await readdir(foldersPath);
-
-    // Log the names of all command files found in the directory.
-    console.log("Command Files:", commandFiles); // Log the files found
 
     // Iterate over each file name in the 'commandFiles' array.
     for (const file of commandFiles) {
@@ -92,7 +86,6 @@ async function loadCommands() {
 }
 
 // Call the loadCommands function to load all commands into the client.
-
 loadCommands();
 
 /**
@@ -102,16 +95,11 @@ loadCommands();
 async function loadEvents() {
   // Define the path to the 'events' directory using path.join to handle cross-platform path issues.
   const eventsPath = path.join(__dirname, "events");
-  // Log the path to ensure it's correct and the directory exists.
-  console.log("Events Path:", eventsPath); // Log the path to the events folder
 
   try {
     // Read all files in the 'events' directory asynchronously using readdir.
     // readdir returns an array of file names in the directory.
     const eventFiles = await readdir(eventsPath);
-
-    // Log the names of all event files found in the directory.
-    console.log("Event Files:", eventFiles);
 
     // Iterate over each file name in the 'eventFiles' array.
     for (const file of eventFiles) {
@@ -119,8 +107,6 @@ async function loadEvents() {
       if (file.endsWith(".js")) {
         // Construct the full path to the event file.
         const filePath = path.join(eventsPath, file);
-        // Log the full path of the event file being processed.
-        console.log("Event file path:", filePath); // Log the path to the event file
 
         try {
           // Dynamically import the event module from the file path.
@@ -243,7 +229,6 @@ async function handleOpenAIResponse(message) {
 
 async function replyDiscord(contentToSend, originalMessage) {
   try {
-    console.log("Sending to OpenAI:", contentToSend);
     // then call getOpenAi response with the cleancontent variable
     const reply = await getOpenAIResponse(contentToSend);
     // send reply back to discord channel
