@@ -5,19 +5,7 @@ import { Collection, Events } from "discord.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import { readdir } from "fs/promises";
-import {
-  SlashCommandBuilder,
-  PermissionFlagsBits,
-  ChannelType,
-} from "discord.js";
-
-// OpenAI Configuration
-import OpenAI from "openai";
-
-// Initialize OpenAI
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+import handleMessage from "./events/message.js";
 
 // Get the current module directory
 const __filename = fileURLToPath(import.meta.url);
@@ -145,7 +133,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
   // Get the command from the client's command collection
   const command = interaction.client.commands.get(interaction.commandName);
-  console.log(command);
 
   // If the command doesn't exist, log an error and return
   if (!command) {
@@ -180,67 +167,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
 // Handle messageCreate event
 client.on(Events.MessageCreate, handleMessage);
 
-// Function to handle messages
-async function handleMessage(message) {
-  if (message.author.bot) return;
-
-  const prefix = "!";
-  const content = message.content.trim();
-  console.log(`Received message: ${content}`);
-
-  if (message.content.startsWith(prefix)) {
-    await cleanMessage(message);
-  }
-}
-
-// Function to handle OpenAI response
-// takes the user message and clean it using regular expression and trim
-async function cleanMessage(message) {
-  let cleanContent = message.content;
-  console.log(`The cleaned content is ${cleanContent}`);
-    cleanContent = cleanContent
-      .replace(new RegExp(`<@!?${client.user.id}>`, "g"), "")
-      .trim();
-
-  replyDiscord(cleanContent, message);
-}
-
-async function replyDiscord(contentToSend, originalMessage) {
-  try {
-    // then call getOpenAi response with the cleancontent variable
-    const reply = await getOpenAIResponse(contentToSend);
-    // send reply back to discord channel
-    await originalMessage.channel.send(reply);
-  } catch (error) {
-    await originalMessage.channel.send("Sorry, something went wrong");
-    console.error("Error processing OpenAI response:", error);
-  }
-}
-
-// Function to get OpenAI response
-async function getOpenAIResponse(messageToAI) {
-  try {
-    console.log("Getting AI response:");
-    const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [
-        { role: "system", content: "You are a helpful assistant." },
-        { role: "user", content: messageToAI },
-      ],
-      max_tokens: 150,
-    });
-
-    console.log("OpenAI Response:", completion.choices[0].message.content);
-    //return openAi response
-    return completion.choices[0].message.content;
-  } catch (error) {
-    console.error(
-      "Error with OpenAI API:",
-      error.response ? error.response.data : error.message || error
-    );
-  }
-}
-
 // This line must be at the very end
 // Signs the bot in with token
 client.login(discordToken);
+
+export default client;
