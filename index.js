@@ -41,16 +41,10 @@ async function loadCommands() {
   // Define the path to the 'commands' directory using path.join to handle cross-platform path issues.
   const foldersPath = path.join(__dirname, "commands");
 
-  // Log the path to ensure it's correct and the directory exists.
-  console.log("Folders Path:", foldersPath); // Ensure this path is correct
-
   try {
     // Read all files in the 'commands' directory asynchronously using readdir.
     // readdir returns an array of file names in the directory.
     const commandFiles = await readdir(foldersPath);
-
-    // Log the names of all command files found in the directory.
-    console.log("Command Files:", commandFiles); // Log the files found
 
     // Iterate over each file name in the 'commandFiles' array.
     for (const file of commandFiles) {
@@ -88,7 +82,6 @@ async function loadCommands() {
 }
 
 // Call the loadCommands function to load all commands into the client.
-
 loadCommands();
 
 /**
@@ -98,16 +91,11 @@ loadCommands();
 async function loadEvents() {
   // Define the path to the 'events' directory using path.join to handle cross-platform path issues.
   const eventsPath = path.join(__dirname, "events");
-  // Log the path to ensure it's correct and the directory exists.
-  console.log("Events Path:", eventsPath); // Log the path to the events folder
 
   try {
     // Read all files in the 'events' directory asynchronously using readdir.
     // readdir returns an array of file names in the directory.
     const eventFiles = await readdir(eventsPath);
-
-    // Log the names of all event files found in the directory.
-    console.log("Event Files:", eventFiles);
 
     // Iterate over each file name in the 'eventFiles' array.
     for (const file of eventFiles) {
@@ -115,8 +103,6 @@ async function loadEvents() {
       if (file.endsWith(".js")) {
         // Construct the full path to the event file.
         const filePath = path.join(eventsPath, file);
-        // Log the full path of the event file being processed.
-        console.log("Event file path:", filePath); // Log the path to the event file
 
         try {
           // Dynamically import the event module from the file path.
@@ -193,36 +179,32 @@ async function handleMessage(message) {
   console.log(`Received message: ${content}`);
 
   if (message.content.startsWith(prefix)) {
-    await handleOpenAIResponse(message);
+    await cleanMessage(message);
   }
 }
 
-// Function to determine if a message should be processed
-function shouldProcessMessage(message) {
-  console.log("checking message processing");
-  return (
-    message.channel.type === ChannelType.DM ||
-    message.mentions.has(client.user.id)
-  );
-}
-
 // Function to handle OpenAI response
-async function handleOpenAIResponse(message) {
+// takes the user message and clean it using regular expression and trim
+async function cleanMessage(message) {
   let cleanContent = message.content;
-
-  console.log("I am calloing handleopenairesponse");
+  console.log(`The cleaned content is ${cleanContent}`);
 
   if (message.channel.type !== ChannelType.DM) {
     cleanContent = cleanContent
       .replace(new RegExp(`<@!?${client.user.id}>`, "g"), "")
       .trim();
   }
+  replyDiscord(cleanContent, message);
+}
 
+async function replyDiscord(contentToSend, originalMessage) {
   try {
-    console.log("Sending to OpenAI:", cleanContent);
-    const reply = await getOpenAIResponse(cleanContent);
-    await message.channel.send(reply);
+    // then call getOpenAi response with the cleancontent variable
+    const reply = await getOpenAIResponse(contentToSend);
+    // send reply back to discord channel
+    await originalMessage.channel.send(reply);
   } catch (error) {
+    await originalMessage.channel.send("Sorry, something went wrong");
     console.error("Error processing OpenAI response:", error);
   }
 }
@@ -231,7 +213,6 @@ async function handleOpenAIResponse(message) {
 async function getOpenAIResponse(conversation) {
   try {
     console.log("Getting AI response:");
-
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: [
@@ -242,14 +223,13 @@ async function getOpenAIResponse(conversation) {
     });
 
     console.log("OpenAI Response:", completion.choices[0].message.content);
+    //return openAi response
     return completion.choices[0].message.content;
-    // throw new Error('throwing error');
   } catch (error) {
     console.error(
       "Error with OpenAI API:",
       error.response ? error.response.data : error.message || error
     );
-    // "I encountered an error processing your request.";
   }
 }
 
