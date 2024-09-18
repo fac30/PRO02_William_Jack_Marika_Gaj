@@ -193,12 +193,10 @@ async function handleMessage(message) {
   const content = message.content.trim();
   console.log(`Received message: ${content}`);
   
-
   if (message.content.startsWith(prefix)) {
     await handleOpenAIResponse(message);
   }
 }
-
 
 // Function to determine if a message should be processed
 function shouldProcessMessage(message) {
@@ -219,18 +217,16 @@ async function handleOpenAIResponse(message) {
   try {
     console.log("Sending to OpenAI:", cleanContent);
     const reply = await getOpenAIResponse(cleanContent);
-    console.log("OpenAI Response to send:", reply);
     await message.channel.send(reply);
   } catch (error) {
     console.error("Error processing OpenAI response:", error);
-    await handleOpenAIError(message);
   }
 }
 
 // Function to get OpenAI response
 async function getOpenAIResponse(conversation) {
   try {
-    console.log("Sending to OpenAI:", conversation);
+    console.log("Getting AI response:");
 
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
@@ -243,7 +239,7 @@ async function getOpenAIResponse(conversation) {
 
     console.log("OpenAI Response:", completion.choices[0].message.content);
     return completion.choices[0].message.content;
-    // throw new Error();
+    // throw new Error('throwing error');
   } catch (error) {
     console.error("Error with OpenAI API:", error.response ? error.response.data : error.message || error);
     // "I encountered an error processing your request.";
