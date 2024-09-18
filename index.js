@@ -10,6 +10,7 @@ import {
   PermissionFlagsBits,
   ChannelType,
 } from "discord.js";
+import cleanMessage from "./openai/clean-message.js";
 
 // OpenAI Configuration
 import OpenAI from "openai";
@@ -190,54 +191,6 @@ async function handleMessage(message) {
 
   if (message.content.startsWith(prefix)) {
     await cleanMessage(message);
-  }
-}
-
-// Function to handle OpenAI response
-// takes the user message and clean it using regular expression and trim
-async function cleanMessage(message) {
-  let cleanContent = message.content;
-  console.log(`The cleaned content is ${cleanContent}`);
-    cleanContent = cleanContent
-      .replace(new RegExp(`<@!?${client.user.id}>`, "g"), "")
-      .trim();
-
-  replyDiscord(cleanContent, message);
-}
-
-async function replyDiscord(contentToSend, originalMessage) {
-  try {
-    // then call getOpenAi response with the cleancontent variable
-    const reply = await getOpenAIResponse(contentToSend);
-    // send reply back to discord channel
-    await originalMessage.channel.send(reply);
-  } catch (error) {
-    await originalMessage.channel.send("Sorry, something went wrong");
-    console.error("Error processing OpenAI response:", error);
-  }
-}
-
-// Function to get OpenAI response
-async function getOpenAIResponse(messageToAI) {
-  try {
-    console.log("Getting AI response:");
-    const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [
-        { role: "system", content: "You are a helpful assistant." },
-        { role: "user", content: messageToAI },
-      ],
-      max_tokens: 150,
-    });
-
-    console.log("OpenAI Response:", completion.choices[0].message.content);
-    //return openAi response
-    return completion.choices[0].message.content;
-  } catch (error) {
-    console.error(
-      "Error with OpenAI API:",
-      error.response ? error.response.data : error.message || error
-    );
   }
 }
 
