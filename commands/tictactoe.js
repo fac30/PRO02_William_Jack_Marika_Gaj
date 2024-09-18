@@ -3,18 +3,22 @@ import {
   ButtonBuilder,
   ButtonStyle,
   SlashCommandBuilder,
+  ComponentType,
 } from "discord.js";
 
 export default {
   data: new SlashCommandBuilder()
     .setName("tictactoe")
     .setDescription("Start Tic Tac Toe..."),
+
   async execute(interaction) {
     const board = [
       ["⬜", "⬜", "⬜"],
       ["⬜", "⬜", "⬜"],
       ["⬜", "⬜", "⬜"],
     ];
+
+    let currentPlayer = "❌";
 
     const createGrid = () => {
       const rows = [];
@@ -26,6 +30,7 @@ export default {
               .setCustomId(`ttt_${i}_${j}`)
               .setLabel(board[i][j] || "⬜")
               .setStyle(ButtonStyle.Secondary)
+              .setDisabled(board[i][j] !== "⬜") // Disable buttons that are already clicked
           );
         }
         rows.push(row);
@@ -39,7 +44,7 @@ export default {
     });
 
     const filter = (i) => {
-      i.customId.startsWith("ttt_") && i.user.id === interaction.user.id;
+      return i.customId.startsWith("ttt_") && i.user.id === interaction.user.id;
     };
     const collector = interaction.channel.createMessageComponentCollector({
       filter,
