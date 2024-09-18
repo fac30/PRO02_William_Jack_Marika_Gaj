@@ -7,8 +7,7 @@ import { Collection, Events } from "discord.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import { readdir } from "fs/promises";
-import { SlashCommandBuilder, PermissionFlagsBits } from "discord.js";
-import { ChannelType } from "discord.js";
+import { SlashCommandBuilder, PermissionFlagsBits, ChannelType } from "discord.js";
 
 // OpenAI Configuration
 import OpenAI from "openai";
@@ -17,7 +16,6 @@ import OpenAI from "openai";
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY, 
   });
-  console.log("OpenAI API Key:", process.env.OPENAI_API_KEY);
 
 
 // Get the current module directory
@@ -194,41 +192,25 @@ async function handleMessage(message) {
   const prefix = "!";
   const content = message.content.trim();
   console.log(`Received message: ${content}`);
+  
 
   if (message.content.startsWith(prefix)) {
-    await handleCommand(message, prefix);
-  } else if (content === "To be or not to be") {
-    await handleSpecificMessage(message);
-  } else if (shouldProcessMessage(message)) {
     await handleOpenAIResponse(message);
   }
 }
 
-// Function to handle commands
-async function handleCommand(message, prefix) {
-  const args = message.content.slice(prefix.length).trim().split(/ +/);
-  const command = args.shift().toLowerCase();
-
-  if (command === "hello") {
-    await message.channel.send("Hello! How can I assist you?");
-  }
-}
-
-// Function to handle specific messages
-async function handleSpecificMessage(message) {
-  await message.channel.send(
-    "that is the question Whether 'tis nobler in the mind to suffer The slings and arrows of outrageous fortune Or to take arms against a sea of troubles And by opposing end them To die To sleep No more and by a sleep to say we end The heartache and the thousand natural shocks That flesh is heir to 'tis a consummation Devoutly to be wished To die to sleep To sleep perchance to dream ay there's the rub For in that sleep of death what dreams may come When we have shuffled off this mortal coil Must give us pause..."
-  );
-}
 
 // Function to determine if a message should be processed
 function shouldProcessMessage(message) {
+  console.log("checking message processing")
   return message.channel.type === ChannelType.DM || message.mentions.has(client.user.id);
 }
 
 // Function to handle OpenAI response
 async function handleOpenAIResponse(message) {
   let cleanContent = message.content;
+
+  console.log("I am calloing handleopenairesponse")
 
   if (message.channel.type !== ChannelType.DM) {
     cleanContent = cleanContent.replace(new RegExp(`<@!?${client.user.id}>`, "g"), "").trim();
@@ -261,29 +243,10 @@ async function getOpenAIResponse(conversation) {
 
     console.log("OpenAI Response:", completion.choices[0].message.content);
     return completion.choices[0].message.content;
+    // throw new Error();
   } catch (error) {
     console.error("Error with OpenAI API:", error.response ? error.response.data : error.message || error);
-    return "I encountered an error processing your request.";
-  }
-}
-
-// Function to handle interaction errors
-async function handleInteractionError(interaction) {
-  const errorMessage = "There was an error while executing this command!";
-  if (interaction.replied || interaction.deferred) {
-    await interaction.followUp({ content: errorMessage, ephemeral: true });
-  } else {
-    await interaction.reply({ content: errorMessage, ephemeral: true });
-  }
-}
-
-// Function to handle OpenAI errors
-async function handleOpenAIError(message) {
-  const errorMessage = "I encountered an error while processing your request.";
-  if (message.channel.type === ChannelType.DM) {
-    await message.author.send(errorMessage);
-  } else {
-    await message.channel.send(errorMessage);
+    // "I encountered an error processing your request.";
   }
 }
 
