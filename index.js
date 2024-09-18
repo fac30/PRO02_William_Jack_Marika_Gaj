@@ -183,7 +183,7 @@ async function handleMessage(message) {
   console.log(`Received message: ${content}`);
 
   if (message.content.startsWith(prefix)) {
-    await handleOpenAIResponse(message);
+    await cleanMessage(message);
   }
 }
 
@@ -191,7 +191,6 @@ async function handleMessage(message) {
 async function getOpenAIResponse(conversation) {
   try {
     console.log("Getting AI response:");
-
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: [
@@ -215,7 +214,7 @@ async function getOpenAIResponse(conversation) {
 
 // Function to handle OpenAI response
 // takes the user message and clean it using regular expression and trim
-async function handleOpenAIResponse(message) {
+async function cleanMessage(message) {
   let cleanContent = message.content;
   console.log(`The cleaned content is ${cleanContent}`);
 
