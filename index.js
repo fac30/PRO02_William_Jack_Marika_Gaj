@@ -229,7 +229,6 @@ async function getOpenAIResponse(conversation) {
 
 // Function to handle OpenAI response
 // takes the user message and clean it using regular expression and trim
-
 async function handleOpenAIResponse(message) {
   let cleanContent = message.content;
   console.log(`The cleaned content is ${cleanContent}`);
@@ -250,6 +249,7 @@ async function replyDiscord(contentToSend, originalMessage) {
     // send reply back to discord channel
     await originalMessage.channel.send(reply);
   } catch (error) {
+    await originalMessage.channel.send("Sorry, something went wrong");
     console.error("Error processing OpenAI response:", error);
   }
 }
