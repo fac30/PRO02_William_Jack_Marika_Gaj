@@ -133,7 +133,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
   // Get the command from the client's command collection
   const command = interaction.client.commands.get(interaction.commandName);
-  console.log(command);
 
   // If the command doesn't exist, log an error and return
   if (!command) {
