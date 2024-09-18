@@ -1,7 +1,5 @@
 import dotenv from "dotenv"; // Import dotenv using ES6 syntax
 dotenv.config(); // Configure dotenv to load .env file
-import testing from "./testing/tests.js";
-import express from "express"; // Import express
 import * as Discord from "discord.js"; // Imports discord.js
 import { Collection, Events } from "discord.js";
 import path from "path";
@@ -24,8 +22,6 @@ const openai = new OpenAI({
 // Get the current module directory
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-import getMeme from "./commands/meme.js";
 
 // Creates new client
 const client = new Discord.Client({
@@ -142,27 +138,37 @@ client.on("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
 
+// Event listener for when an interaction is created
 client.on(Events.InteractionCreate, async (interaction) => {
+  // Check if the interaction is a chat input command
   if (!interaction.isChatInputCommand()) return;
 
+  // Get the command from the client's command collection
   const command = interaction.client.commands.get(interaction.commandName);
   console.log(command);
 
+  // If the command doesn't exist, log an error and return
   if (!command) {
     console.error(`No command matching ${interaction.commandName} was found.`);
     return;
   }
 
   try {
+    // Execute the command
     await command.execute(interaction);
   } catch (error) {
+    // If an error occurs during execution, log it
     console.error(error);
+
+    // Check if the interaction has already been replied to or deferred
     if (interaction.replied || interaction.deferred) {
+      // If so, send a follow-up message
       await interaction.followUp({
         content: "There was an error while executing this command!",
         ephemeral: true,
       });
     } else {
+      // If not, send a reply
       await interaction.reply({
         content: "There was an error while executing this command!",
         ephemeral: true,
@@ -212,14 +218,14 @@ async function replyDiscord(contentToSend, originalMessage) {
 }
 
 // Function to get OpenAI response
-async function getOpenAIResponse(conversation) {
+async function getOpenAIResponse(messageToAI) {
   try {
     console.log("Getting AI response:");
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: [
         { role: "system", content: "You are a helpful assistant." },
-        { role: "user", content: conversation },
+        { role: "user", content: messageToAI },
       ],
       max_tokens: 150,
     });
