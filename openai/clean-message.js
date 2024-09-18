@@ -1,4 +1,5 @@
 import replyDiscord from "./reply-discord.js";
+import client from "../index.js";
 
 // Function to handle OpenAI response
 // takes the user message and clean it using regular expression and trim

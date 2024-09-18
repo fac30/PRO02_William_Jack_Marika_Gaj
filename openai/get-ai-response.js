@@ -1,4 +1,12 @@
-// Function to get OpenAI response
+import OpenAI from "openai";
+import dotenv from "dotenv"; // Import dotenv using ES6 syntax
+dotenv.config(); // Configure dotenv to load .env file
+
+// Initialize OpenAI
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
 async function getOpenAIResponse(messageToAI) {
   try {
     console.log("Getting AI response:");

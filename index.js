@@ -5,20 +5,7 @@ import { Collection, Events } from "discord.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import { readdir } from "fs/promises";
-import {
-  SlashCommandBuilder,
-  PermissionFlagsBits,
-  ChannelType,
-} from "discord.js";
-import cleanMessage from "./openai/clean-message.js";
-
-// OpenAI Configuration
-import OpenAI from "openai";
-
-// Initialize OpenAI
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+import handleMessage from "./events/message.js";
 
 // Get the current module directory
 const __filename = fileURLToPath(import.meta.url);
@@ -181,19 +168,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
 // Handle messageCreate event
 client.on(Events.MessageCreate, handleMessage);
 
-// Function to handle messages
-async function handleMessage(message) {
-  if (message.author.bot) return;
-
-  const prefix = "!";
-  const content = message.content.trim();
-  console.log(`Received message: ${content}`);
-
-  if (message.content.startsWith(prefix)) {
-    await cleanMessage(message);
-  }
-}
-
 // This line must be at the very end
 // Signs the bot in with token
 client.login(discordToken);
+
+export default client;
