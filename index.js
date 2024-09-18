@@ -198,12 +198,10 @@ async function handleMessage(message) {
 async function cleanMessage(message) {
   let cleanContent = message.content;
   console.log(`The cleaned content is ${cleanContent}`);
-
-  if (message.channel.type !== ChannelType.DM) {
     cleanContent = cleanContent
       .replace(new RegExp(`<@!?${client.user.id}>`, "g"), "")
       .trim();
-  }
+
   replyDiscord(cleanContent, message);
 }
 
