@@ -5,6 +5,11 @@ import { Collection, Events } from "discord.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import { readdir } from "fs/promises";
+import {
+  SlashCommandBuilder,
+  PermissionFlagsBits,
+  ChannelType,
+} from "discord.js";
 
 // OpenAI Configuration
 import OpenAI from "openai";
@@ -176,77 +181,78 @@ client.on(Events.InteractionCreate, async (interaction) => {
   }
 });
 
-// Handle messageCreate directly in index.js
-client.on(Events.MessageCreate, (message) => {
-  // Ignore messages from bots to avoid an infinite loop
+// Handle messageCreate event
+client.on(Events.MessageCreate, handleMessage);
+
+// Function to handle messages
+async function handleMessage(message) {
   if (message.author.bot) return;
 
-  // Log received messages to the console
-  console.log(`Received message: ${message.content}`);
+  const prefix = "!";
+  const content = message.content.trim();
+  console.log(`Received message: ${content}`);
 
-  // Example: Respond to a specific message
-  if (message.content === "To be or not to be") {
-    message.channel.send(
-      "that is the question Whether tis nobler in the mind to suffer The slings and arrows of outrageous fortune Or to take arms against a sea of troubles And by opposing end them To die To sleep No more and by a sleep to say we end The heartache and the thousand natural shocks That flesh is heir to tis a consummation Devoutly to be wished To die to sleep To sleep perchance to dream ay theres the rub For in that sleep of death what dreams may come When we have shuffled off this mortal coil Must give us pause theres the respect That makes calamity of so long life For who would bear the whips and scorns of time The oppressors wrong the proud mans contumely The pangs of despised love the laws delay The insolence of office and the spurns That patient merit of the unworthy takes When he himself might his quietus make With a bare bodkin who would fardels bear To grunt and sweat under a weary life But that the dread of something after death The undiscovered country from whose bourn No traveller returns puzzles the will And makes us rather bear those ills we have Than fly to others that we know not of Thus conscience does make cowards of us all And thus the native hue of resolution Is sicklied oer with the pale cast of thought And enterprises of great pith and moment With this regard their currents turn awry And lose the name of action Soft you now The fair Ophelia Nymph in thy orisons Be all my sins remembered"
-    ); // Reply with 'Pong!'
-  }
-});
-
-async function getOpenAIResponse(conversation) {
-  try {
-    const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [
-        // This is the missing key
-        { role: "system", content: "You are a helpful assistant." },
-        {
-          role: "user",
-          content: "Write a haiku about recursion in programming.",
-        },
-      ],
-    });
-
-    return completion.choices[0].message.content; // Return the generated response content
-  } catch (error) {
-    console.error("Error with OpenAI API:", error);
-    return "I encountered an error processing your request.";
+  if (message.content.startsWith(prefix)) {
+    await handleOpenAIResponse(message);
   }
 }
 
-client.on("messageCreate", async (message) => {
-  // ignore messages from bots
-  if (message.author.bot) return;
+// Function to determine if a message should be processed
+function shouldProcessMessage(message) {
+  console.log("checking message processing");
+  return (
+    message.channel.type === ChannelType.DM ||
+    message.mentions.has(client.user.id)
+  );
+}
 
-  // check if the message is DM or mentions the bot in a server
-  if (message.channel.type === "DM" || message.mentions.has(client.user.id)) {
-    let content = message.content;
+// Function to handle OpenAI response
+async function handleOpenAIResponse(message) {
+  let cleanContent = message.content;
 
-    // if the message is in server and mentions the bot, remove the mention from the message
-    if (message.channel.type !== "DM") {
-      content = content
-        .replace(new RegExp(`<@!?${client.user.id}>`, "g"), "")
-        .trim();
-    }
+  console.log("I am calloing handleopenairesponse");
 
-    // generate and send a response using OpenAI API
-    try {
-      const reply = await generateOpenAIResponse(content);
-      await message.channel.send(reply);
-    } catch (error) {
-      console.error(
-        "Error in sending DM or processing OpenAI response:",
-        error
-      );
-      // inform the user that an error occurred (optional)
-      if (message.channel.type === "DM") {
-        await message.author.send(
-          "I encountered an error while processing your request."
-        );
-      }
-    }
+  if (message.channel.type !== ChannelType.DM) {
+    cleanContent = cleanContent
+      .replace(new RegExp(`<@!?${client.user.id}>`, "g"), "")
+      .trim();
   }
-});
 
-//**********************************************  This line must be at the very end ****************************************
+  try {
+    console.log("Sending to OpenAI:", cleanContent);
+    const reply = await getOpenAIResponse(cleanContent);
+    await message.channel.send(reply);
+  } catch (error) {
+    console.error("Error processing OpenAI response:", error);
+  }
+}
+
+// Function to get OpenAI response
+async function getOpenAIResponse(conversation) {
+  try {
+    console.log("Getting AI response:");
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [
+        { role: "system", content: "You are a helpful assistant." },
+        { role: "user", content: conversation },
+      ],
+      max_tokens: 150,
+    });
+
+    console.log("OpenAI Response:", completion.choices[0].message.content);
+    return completion.choices[0].message.content;
+    // throw new Error('throwing error');
+  } catch (error) {
+    console.error(
+      "Error with OpenAI API:",
+      error.response ? error.response.data : error.message || error
+    );
+    // "I encountered an error processing your request.";
+  }
+}
+
+// This line must be at the very end
 // Signs the bot in with token
 client.login(discordToken);
