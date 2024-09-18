@@ -239,19 +239,20 @@ async function handleOpenAIResponse(message) {
       .replace(new RegExp(`<@!?${client.user.id}>`, "g"), "")
       .trim();
   }
-  
+  replyDiscord(cleanContent, message);
+}
+
+async function replyDiscord(contentToSend, originalMessage) {
   try {
-    console.log("Sending to OpenAI:", cleanContent);
+    console.log("Sending to OpenAI:", contentToSend);
     // then call getOpenAi response with the cleancontent variable
-    const reply = await getOpenAIResponse(cleanContent);
+    const reply = await getOpenAIResponse(contentToSend);
     // send reply back to discord channel
-    await message.channel.send(reply);
+    await originalMessage.channel.send(reply);
   } catch (error) {
     console.error("Error processing OpenAI response:", error);
   }
 }
-
-
 
 // This line must be at the very end
 // Signs the bot in with token
