@@ -3,18 +3,22 @@ import {
   ButtonBuilder,
   ButtonStyle,
   SlashCommandBuilder,
+  ComponentType,
 } from "discord.js";
 
 export default {
   data: new SlashCommandBuilder()
     .setName("tictactoe")
     .setDescription("Start Tic Tac Toe..."),
+
   async execute(interaction) {
     const board = [
       ["⬜", "⬜", "⬜"],
       ["⬜", "⬜", "⬜"],
       ["⬜", "⬜", "⬜"],
     ];
+
+    let currentPlayer = "❌";
 
     const createGrid = () => {
       const rows = [];
@@ -26,6 +30,7 @@ export default {
               .setCustomId(`ttt_${i}_${j}`)
               .setLabel(board[i][j] || "⬜")
               .setStyle(ButtonStyle.Secondary)
+              .setDisabled(board[i][j] !== "⬜") // Disable buttons that are already clicked
           );
         }
         rows.push(row);
@@ -36,6 +41,41 @@ export default {
     await interaction.reply({
       content: "Tic Tac Toe started! Click on a button to play!",
       components: createGrid(),
+    });
+
+    const filter = (i) => {
+      return i.customId.startsWith("ttt_") && i.user.id === interaction.user.id;
+    };
+    const collector = interaction.channel.createMessageComponentCollector({
+      filter,
+      componentType: ComponentType.Button,
+      time: 60000, // 1 minute timeout
+    });
+
+    collector.on("collect", async (i) => {
+      const [_, row, col] = i.customId.split("_");
+      const rowIndex = parseInt(row);
+      const colIndex = parseInt(col);
+
+      // Update the board
+      if (board[rowIndex][colIndex] === "⬜") {
+        board[rowIndex][colIndex] = currentPlayer;
+        currentPlayer = currentPlayer === "❌" ? "⭕" : "❌";
+      }
+
+      // Check for win condition or draw (this can be added later)
+
+      await i.update({
+        content: `Tic Tac Toe ongoing! ${currentPlayer}'s turn`,
+        components: createGrid(),
+      });
+    });
+
+    collector.on("end", async () => {
+      await interaction.editReply({
+        content: "Tic Tac Toe game ended.",
+        components: [],
+      });
     });
   },
 };
