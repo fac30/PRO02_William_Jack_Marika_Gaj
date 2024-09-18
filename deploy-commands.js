@@ -1,16 +1,8 @@
-import {
-  REST,
-  Routes,
-  Collection,
-  SlashCommandBuilder,
-  PermissionFlagsBits,
-} from "discord.js";
+import { REST, Routes } from "discord.js";
 import dotenv from "dotenv";
-import { readdirSync } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { readdir } from "fs/promises";
-import express from "express";
 
 // Initialize dotenv to load .env file
 dotenv.config();
@@ -18,7 +10,7 @@ dotenv.config();
 // Resolve __dirname for ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-    
+
 // Initialize the REST client
 const rest = new REST().setToken(process.env.DISCORD_TOKEN);
 
