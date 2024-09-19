@@ -5,7 +5,7 @@ const discordToken = process.env.DISCORD_TOKEN;
 const channelId = process.env.CHANNEL_ID;
 
 export default {
-  name: Events.ClientReady,
+  name: Events.InteractionCreate,
   once: true, // The ready event should only run once
   execute(client) {
     console.log(`Ready! Logged in as ${client.user.tag}`);

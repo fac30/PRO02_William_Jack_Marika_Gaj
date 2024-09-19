@@ -26,7 +26,6 @@ const discordToken = process.env.DISCORD_TOKEN;
 // Initialise a new Collection for storing commands
 client.commands = new Collection();
 
-
 async function loadCommands() {
   // Define the path to the 'commands' directory using path.join to handle cross-platform path issues.
   const foldersPath = path.join(__dirname, "commands");
