@@ -6,6 +6,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { readdir } from "fs/promises";
 import handleMessage from "./events/message.js";
+// import { personality } from "./openai/personalities.js";
 
 // Get the current module directory
 const __filename = fileURLToPath(import.meta.url);
