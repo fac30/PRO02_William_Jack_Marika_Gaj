@@ -5,12 +5,10 @@ import client from "../index.js";
 // takes the user message and clean it using regular expression and trim
 async function cleanMessage(message) {
   let cleanContent = message.content;
-  console.log(`The cleaned content is ${cleanContent}`);
-  cleanContent = cleanContent
+
+  return cleanContent
     .replace(new RegExp(`<@!?${client.user.id}>`, "g"), "")
     .trim();
-
-  replyDiscord(cleanContent, message);
 }
 
 export default cleanMessage;
