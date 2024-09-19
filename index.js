@@ -165,9 +165,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
   }
 });
 
-// Handle messageCreate event
-client.on(Events.MessageCreate, handleMessage);
-
 // This line must be at the very end
 // Signs the bot in with token
 client.login(discordToken);
