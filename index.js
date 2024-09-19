@@ -5,7 +5,8 @@ import { Collection, Events } from "discord.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import { readdir } from "fs/promises";
-import handleMessage from "./events/message.js";
+import handleMessage from "./messaging/message.js";
+// import { personality } from "./openai/personalities.js";
 
 // Get the current module directory
 const __filename = fileURLToPath(import.meta.url);
@@ -121,51 +122,6 @@ async function loadEvents() {
 
 // Call the loadEvents function to load all event files
 loadEvents();
-
-client.on("ready", () => {
-  console.log(`Logged in as ${client.user.tag}!`);
-});
-
-// Event listener for when an interaction is created
-client.on(Events.InteractionCreate, async (interaction) => {
-  // Check if the interaction is a chat input command
-  if (!interaction.isChatInputCommand()) return;
-
-  // Get the command from the client's command collection
-  const command = interaction.client.commands.get(interaction.commandName);
-
-  // If the command doesn't exist, log an error and return
-  if (!command) {
-    console.error(`No command matching ${interaction.commandName} was found.`);
-    return;
-  }
-
-  try {
-    // Execute the command
-    await command.execute(interaction);
-  } catch (error) {
-    // If an error occurs during execution, log it
-    console.error(error);
-
-    // Check if the interaction has already been replied to or deferred
-    if (interaction.replied || interaction.deferred) {
-      // If so, send a follow-up message
-      await interaction.followUp({
-        content: "There was an error while executing this command!",
-        ephemeral: true,
-      });
-    } else {
-      // If not, send a reply
-      await interaction.reply({
-        content: "There was an error while executing this command!",
-        ephemeral: true,
-      });
-    }
-  }
-});
-
-// Handle messageCreate event
-client.on(Events.MessageCreate, handleMessage);
 
 // This line must be at the very end
 // Signs the bot in with token

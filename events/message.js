@@ -1,16 +1,10 @@
-import cleanMessage from "../openai/clean-message.js";
+import { Events } from "discord.js";
+import handleMessage from "../messaging/message.js";
 
-// Function to handle messages
-async function handleMessage(message) {
-  if (message.author.bot) return;
+export default {
+  name: Events.MessageCreate,
 
-  const prefix = "!";
-  const content = message.content.trim();
-  console.log(`Received message: ${content}`);
-
-  if (message.content.startsWith(prefix)) {
-    await cleanMessage(message);
-  }
-}
-
-export default handleMessage;
+  async execute(message) {
+    handleMessage(message);
+  },
+};
