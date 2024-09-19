@@ -5,7 +5,7 @@ import { Collection, Events } from "discord.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import { readdir } from "fs/promises";
-import handleMessage from "./events/message.js";
+import handleMessage from "./messaging/message.js";
 // import { personality } from "./openai/personalities.js";
 
 // Get the current module directory
