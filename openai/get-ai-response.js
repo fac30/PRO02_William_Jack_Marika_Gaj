@@ -10,7 +10,6 @@ const openai = new OpenAI({
 
 async function getOpenAIResponse(messageToAI) {
   try {
-    console.log("Getting AI response:");
     console.log(`current personality is ${personality}`);
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
@@ -21,7 +20,7 @@ async function getOpenAIResponse(messageToAI) {
       max_tokens: 150,
     });
 
-    console.log("OpenAI Response:", completion.choices[0].message.content);
+    // console.log("OpenAI Response:", completion.choices[0].message.content);
     //return openAi response
     return completion.choices[0].message.content;
   } catch (error) {
