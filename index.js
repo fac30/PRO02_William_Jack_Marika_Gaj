@@ -25,6 +25,7 @@ const discordToken = process.env.DISCORD_TOKEN;
 // Initialise a new Collection for storing commands
 client.commands = new Collection();
 
+
 async function loadCommands() {
   // Define the path to the 'commands' directory using path.join to handle cross-platform path issues.
   const foldersPath = path.join(__dirname, "commands");
@@ -162,7 +163,28 @@ client.on(Events.InteractionCreate, async (interaction) => {
       });
     }
   }
+
+   // Check if the interaction is a button click
+   if (interaction.isButton()) {
+    // Handle Confirm button
+    if (interaction.customId === "confirm") {
+      await interaction.update({
+        content: "You have confirmed the action!",
+        components: [], 
+      });
+    }
+
+    // Handle Cancel button
+    else if (interaction.customId === "cancel") {
+      await interaction.update({
+        content: "You have cancelled the action.",
+        components: [], 
+      });
+    }
+  }
 });
+
+
 
 // Handle messageCreate event
 client.on(Events.MessageCreate, handleMessage);
