@@ -130,57 +130,64 @@ client.on("ready", () => {
 
 // Event listener for when an interaction is created
 client.on(Events.InteractionCreate, async (interaction) => {
+
   // Check if the interaction is a chat input command
-  if (!interaction.isChatInputCommand()) return;
+  if (interaction.isChatInputCommand()) {
+    // Get the command from the client's command collection
+    const command = interaction.client.commands.get(interaction.commandName);
 
-  // Get the command from the client's command collection
-  const command = interaction.client.commands.get(interaction.commandName);
+    // If the command doesn't exist, log an error and return
+    if (!command) {
+      console.error(`No command matching ${interaction.commandName} was found.`);
+      return;
+    }
 
-  // If the command doesn't exist, log an error and return
-  if (!command) {
-    console.error(`No command matching ${interaction.commandName} was found.`);
-    return;
-  }
+    try {
+      // Execute the command
+      await command.execute(interaction);
+    } catch (error) {
+      // If an error occurs during execution, log it
+      console.error(error);
 
-  try {
-    // Execute the command
-    await command.execute(interaction);
-  } catch (error) {
-    // If an error occurs during execution, log it
-    console.error(error);
-
-    // Check if the interaction has already been replied to or deferred
-    if (interaction.replied || interaction.deferred) {
-      // If so, send a follow-up message
-      await interaction.followUp({
-        content: "There was an error while executing this command!",
-        ephemeral: true,
-      });
-    } else {
-      // If not, send a reply
-      await interaction.reply({
-        content: "There was an error while executing this command!",
-        ephemeral: true,
-      });
+      // Check if the interaction has already been replied to or deferred
+      if (interaction.replied || interaction.deferred) {
+        // If so, send a follow-up message
+        await interaction.followUp({
+          content: "There was an error while executing this command!",
+          ephemeral: true,
+        });
+      } else {
+        // If not, send a reply
+        await interaction.reply({
+          content: "There was an error while executing this command!",
+          ephemeral: true,
+        });
+      }
     }
   }
 
-   // Check if the interaction is a button click
-   if (interaction.isButton()) {
-    // Handle Confirm button
-    if (interaction.customId === "confirm") {
-      await interaction.update({
-        content: "You have confirmed the action!",
-        components: [], 
-      });
-    }
+  // Check if the interaction is a button click
+  if (interaction.isButton()) {
+    console.log(`Button clicked with customId: ${interaction.customId}`);
 
-    // Handle Cancel button
-    else if (interaction.customId === "cancel") {
-      await interaction.update({
-        content: "You have cancelled the action.",
-        components: [], 
-      });
+    try {
+      // Handle Confirm button
+      if (interaction.customId === "confirm") {
+        await interaction.update({
+          content: "You have confirmed the action!",
+          components: [], 
+        });
+      }
+
+      // Handle Cancel button
+      else if (interaction.customId === "cancel") {
+        await interaction.update({
+          content: "You have cancelled the action.",
+          components: [], 
+        });
+      }
+    } catch (error) {
+      console.error('Failed to update interaction:', error);
     }
   }
 });
